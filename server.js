@@ -16,7 +16,7 @@ var query = require("samp-query");
 const covid = require("./script/covid");
 const resi = require("./script/cekresi");
 const PrayTimes = require("./script/sholat");
-const youtube = require("./script/yt");
+//const youtube = require("./script/yt");
 const texttoimg = require('./script/texttoimg')
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -55,15 +55,6 @@ app.get("/api/v1/texttoimg", async (req, res) => {
   }
 });
 
-app.get("/api/v1/facebook", async (req, res) => {
-  const link = req.qeury.url;
-  if (link == undefined) {
-    res.status("400").send({
-      message: "kode : 0"
-    });
-  }
-  fb.scrap(link);
-});
 
 app.get("/api/v1/samp", async (req, res) => {
   var ip = req.query.ip;
@@ -90,6 +81,23 @@ app.get("/api/v1/samp", async (req, res) => {
     else res.json(response);
   });
 });
+
+app.get('/api/v1/texttoimg', async (req, res) => {
+  var text = req.query.text;
+  if(text == undefined){
+    res.sendStatus("400").send({
+      message: "Text Not Found"
+    })
+  }
+  try {
+    const data = texttoimg.Convert(text)
+    res.json(data)
+  }
+  catch (err)
+  {
+      res.json(err);
+  }
+})
 
 app.get("/api/v1/sholat", async (req, res) => {
   const endDate = moment().add(1, "days");
