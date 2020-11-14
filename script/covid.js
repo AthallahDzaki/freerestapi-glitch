@@ -65,7 +65,7 @@ async function getArea (latitude, longitude, size = 10) {
     })
 };
 
-async function getLocationData(latitude, longitude) {
+exports.getLocationData = async function getLocationData(latitude, longitude) {
     try {
         const responses = await Promise.all([getZoneStatus(latitude, longitude), getArea(latitude, longitude)])
         const result = {
@@ -82,6 +82,3 @@ async function getLocationData(latitude, longitude) {
     }
 }
 
-module.exports = {
-  getLocationData
-}

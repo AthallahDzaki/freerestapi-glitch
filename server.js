@@ -11,6 +11,7 @@ const cors = require("cors");
 const ytdl = require("ytdl-core");
 const fs = require("fs");
 var query = require("samp-query");
+var fetch = require("node-fetch")
 
 //Static Script
 const covid = require("./script/covid");
@@ -18,6 +19,7 @@ const resi = require("./script/cekresi");
 const PrayTimes = require("./script/sholat");
 const youtube = require("./script/yt");
 const texttoimg = require('./script/texttoimg')
+const Nulis = require('./script/nulis')
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
@@ -46,6 +48,20 @@ app.get("/api/v1/cekresi", async (req, res) => {
   const res1 = req.query.resi;
   res.json(await resi.cekResi(ekspedisi, resi));
 });
+
+app.get("/api/v1/tiktok", asysnc (req, res) => {
+  const link = req.query.link;
+  const wm = req.query.wm;
+  if(link == undefine){
+    res.status('400').send({
+      message:'Invalid Tiktok URL'
+    })
+  }
+  fetch('https://')
+    .then(res => res.json()) // expecting a json response
+    .then(json => console.log(json));
+}
+
 app.get("/api/v1/texttoimg", async (req, res) => {
   const text = req.query.text;
   if (text == undefined) {
@@ -54,6 +70,35 @@ app.get("/api/v1/texttoimg", async (req, res) => {
     })
   }
 });
+
+app.get("/api/v1/youtube", async (req, res) => {
+   var link = req.query.link || req.query.url;
+   if(link == undefined) {
+      res.status("400").send({
+        message:"Ketikkan URL yang akan di ambil vidionya"
+      })
+   }
+   fetch('https://alfians-api.herokuapp.com/api/yta?url='+link).then(response => (res.json(response.data.))
+})
+
+app.get("/api/v1/nulis", async (req, res) => {
+   var text = req.query.text;
+   if(text == undefined) {
+      res.status("400").send({
+        message:"Ketikkan Text Yang Akan Di Tulis"
+      })
+   }
+   Nulis.Nulis(text).then(ress => {
+                        ress.map(link => {
+                            res.json(link);
+                        })
+                    })
+                    .catch(err => {
+                        res.status("404").send({
+                        message:'[NULIS] Error:'+err
+                      })
+                    })
+})
 
 app.get("/api/v1/facebook", async (req, res) => {
   const link = req.qeury.url;
@@ -146,7 +191,8 @@ app.get("/api/v1/covid", async (request, response) => {
     long == undefined
   ) {
     return response.status(400).send({
-      message: "Invalid Langitude Or Longitude!"
+      message: "Invalid Latitude Or Longitude!",
+      message: "Lat for  Latitude and Long for Logtitude"
     });
   }
   var res = await covid.getLocationData(lat, long);
@@ -154,6 +200,7 @@ app.get("/api/v1/covid", async (request, response) => {
 });
 
 // listen for requests :)
-const listener = app.listen(process.env.PORT, () => {
+const listener = app.listen('80', () => {
   console.log("Your app is listening on port " + listener.address().port);
 });
+
